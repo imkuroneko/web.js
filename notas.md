@@ -1,7 +1,7 @@
 ### login:post
 ```html
 app.post('/ruta', (req, res) => {
-    if (req.session && req.session.userId) {
+    if(req.session && req.session.userId) {
         const nombre = req.body.nombre;
         const correo = req.body.correo;
 

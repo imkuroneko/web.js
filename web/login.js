@@ -8,7 +8,7 @@ const { website } = require(path.resolve('./data/conf.json'));
 
 /* === Endpoints Interacción ===================================================================================================== */
 router.get('/login', (req, res) => {
-    if (req.session.loggedin) { return res.redirect('/dashboard'); }
+    if(req.session.user) { return res.redirect('/dashboard'); }
 
     res.render('login', {
         title: website.name
