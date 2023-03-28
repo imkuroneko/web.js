@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 
 /* ===== Cargar parámetros =============================================================================== */
-const config = require(path.resolve('./conf.json'));
+const config = require(path.resolve('./data/conf.json'));
 
 /* ===== Crear instancia expressJs ======================================================================= */
 const app = express();

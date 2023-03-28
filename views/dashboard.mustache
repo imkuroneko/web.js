@@ -1,40 +1,19 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <title>Dashboard</title>
-    </head>
-    <body>
+{{> inc/logged/header }}
+
+<main>
+    <div class="bd-masthead">
+
         {{#username}}
             <h1>Bienvenido {{username}}</h1>
             <a href="/logout">Cerrar sesión</a>
         {{/username}}
-        {{^username}}
-            <h1>No has iniciado sesión</h1>
-            <p>Por favor inicia sesión <a href="/login">aquí</a>.</p>
-        {{/username}}
-    </body>
-</html>
 
-
-{{> inc/header }}
-
-<main>
-    <div class="bd-masthead">
         <h1 class="text-center">Jumbotron with icon</h1>
         <p class="text-center fs-5 text-muted">
             This is a custom jumbotron featuring an SVG image at the top, some longer text that wraps early thanks to a responsive <code>.col-*</code> class, and a customized call to action.
         </p>
 
-        <div class="text-center mx-auto gap-2 mb-5">
-            <button class="d-inline-flex align-items-center btn btn-primary btn-lg px-4 rounded-pill" type="button">
-                Call to action <i class="ml-2 bi bi-arrow-right-short"></i>
-            </button>
-            <button class="btn btn-outline-secondary btn-lg px-4 rounded-pill" type="button">
-                Secondary link
-            </button>
-        </div>
     </div>
 </main>
 
-{{> inc/footer }}
+{{> inc/logged/footer }}

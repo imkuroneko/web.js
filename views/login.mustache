@@ -1,7 +1,7 @@
-{{> inc/header_login }}
+{{> inc/login/header }}
 
 <main class="form-signin">
-    <form>
+    <form method="post" action="/login">
         <img class="mb-4" src="/images/logo.png" alt="" width="72" height="57">
         <h5 class="mb-3 fw-normal">Please sign in</h5>
 
@@ -16,6 +16,10 @@
 
         <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
     </form>
+
+    {{#error}}
+        <div class="alert alert-danger text-center small p-2 mb-0 mt-2">{{error}}</div>
+    {{/error}}
 </main>
 
-{{> inc/footer }}
+{{> inc/login/footer }}

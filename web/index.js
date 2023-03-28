@@ -1,12 +1,15 @@
 /* === Dependencias ============================================================================================================== */
 const express = require('express');
 const router = express.Router();
-const { v4: uuidv4 } = require('uuid');
+const path = require('path');
+
+/* ===== Cargar parámetros ======================================================================================================= */
+const { website } = require(path.resolve('./data/conf.json'));
 
 /* === Endpoints Interacción ===================================================================================================== */
 router.get('/', (req, res) => {
     res.render('index', {
-        title: 'Mi sitio web'
+        title: website.name
     });
 });
 
