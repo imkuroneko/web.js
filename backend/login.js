@@ -11,8 +11,16 @@ const { website, db } = require(path.resolve('./data/conf.json'));
 
 /* === Endpoints Interacción ===================================================================================================== */
 router.post('/login', async (req, res) => {
+
+    // controlar que no esté logueado
+
     try {
         const { username, password } = req.body;
+
+        // controlar recepción de username
+        // controlar recepción de password
+
+        // crear función de sanitización para username (keep: A-Z 0-9 _)
 
         const conn = mysql.createConnection({
             host:     db.host,
@@ -41,6 +49,7 @@ router.post('/login', async (req, res) => {
                         req.session.user = rst[0].usuario;
                         req.session.mail = rst[0].email;
                         req.session.name = rst[0].nom_ape;
+                        req.session.fingerprint = '';      // por agregar
 
                         return res.redirect('/dashboard');
                     });
