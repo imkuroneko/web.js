@@ -27,21 +27,23 @@ app.use(express.json());
 app.use(session({
     secret: config.sessionSecret,
     resave: false,
-    saveUninitialized: true
+    saveUninitialized: false
 }));
 
 /* ===== Cargar módulos ================================================================================== */
 try {
-    app.use(require(path.resolve('./web/index')));
-    app.use(require(path.resolve('./web/login')));
-    app.use(require(path.resolve('./web/logout')));
-    app.use(require(path.resolve('./web/ip')));
-    app.use(require(path.resolve('./web/dashboard')));
+    app.use(require(path.resolve('./web/public/index')));
+    app.use(require(path.resolve('./web/public/ip')));
+
+    app.use(require(path.resolve('./web/panel/login')));
+    app.use(require(path.resolve('./web/panel/logout')));
+    app.use(require(path.resolve('./web/panel/dashboard')));
 
     app.use(require(path.resolve('./backend/login')));
 
+    app.use(require(path.resolve('./web/default')));
 } catch (error) {
-    console.error('[load:endpoints]', error.message);
+    console.error('[load:endpoints]', error);
 }
 
 /* ===== Levantar servidor =============================================================================== */
