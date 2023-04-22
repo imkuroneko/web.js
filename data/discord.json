@@ -1,0 +1,6 @@
+{
+    "clientId"      : "3000",
+    "clientSecret"  : "3000",
+    "redirectUri"   : "3000",
+    "scopes"        : "3000"
+}
