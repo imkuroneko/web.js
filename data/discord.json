@@ -1,6 +1,10 @@
 {
-    "clientId"      : "3000",
-    "clientSecret"  : "3000",
-    "redirectUri"   : "3000",
-    "scopes"        : "3000"
+    "clientId"      : "",
+    "clientSecret"  : "",
+
+    "botToken"      : "",
+
+    "publicKey"     : "",
+    "redirectUri"   : "http://localhost:3000/auth/discord/callback",
+    "scopes"        : [ "identify", "guilds" ]
 }

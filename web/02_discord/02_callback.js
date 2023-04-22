@@ -1,60 +1,130 @@
 /* === Dependencias ============================================================================================================== */
 const express = require('express');
+const bcrypt = require('bcrypt');
 const router = express.Router();
-const crypto = require('crypto');
+const axios = require('axios');
 const path = require('path');
+const { v4: uuidv4 } = require('uuid');
 
 /* ===== Cargar parámetros =============================================================================== */
 const discord = require(path.resolve('./data/discord.json'));
+const { website } = require(path.resolve('./data/conf.json'));
 
 /* === Endpoints Interacción ===================================================================================================== */
-router.get('/auth/discord/callback', (req, res) => {
+router.get('/auth/discord/callback', async (req, res) => {
     if(req.session.user) { return res.redirect('/dashboard'); }
 
-    const { code, state } = req.query;
-    const storedState = req.cookies.state;
+    try {
+        const { code, state } = req.query;
+        const storedState = req.session.state;
 
-    if (state !== storedState) {
-        res.status(403).send('CSRF token mismatch');
-        return;
-    }
+        if (!code) {
+            return res.status(400).send('Missing authorization code');
+        }
 
-    res.clearCookie('state');
-    const data = new URLSearchParams({
-        client_id       : discord.clientId,
-        client_secret   : discord.clientSecret,
-        grant_type      : 'authorization_code',
-        code            : code,
-        redirect_uri    : discord.redirectUri,
-        scope           : discord.scopes
-    });
+        if (state !== storedState) {
+            return res.status(403).send('CSRF token mismatch');
+        }
 
-    const options = {
-        method: 'POST',
-        hostname: 'discord.com',
-        path: '/api/oauth2/token',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    };
 
-    const reqToken = https.request(options, (resToken) => {
-        let body = '';
-        resToken.on('data', (chunk) => { body += chunk; });
+        const postHeader = {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        };
 
-        resToken.on('end', () => {
-            // aqui se parsea toda la información recibida
-            // y se debe agregar el control de si está o no en el guild y si tiene o no el rol necesario
-            const { access_token } = JSON.parse(body);
-            res.send(`Token de acceso: ${access_token}`);
+        const postParams = {
+            grant_type      : 'authorization_code',
+            client_id       : discord.clientId,
+            client_secret   : discord.clientSecret,
+            redirect_uri    : discord.redirectUri,
+            code,
+        };
+
+        axios.post('https://discord.com/api/v10/oauth2/token', postParams, postHeader).then((resultPost) => {
+            const accessToken = resultPost.data.access_token;
+
+            const getParams = {
+                headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+            };
+
+            axios.get('https://discord.com/api/v10/users/@me', getParams).then((resultGet) => {
+                const { id, username, discriminator } = resultGet.data;
+
+                // Crear una sesión para el usuario
+                req.session.state         = null;
+                req.session.fingerprint   = bcrypt.hashSync(id, 10);
+                req.session.userId        = id;
+                req.session.username      = username;
+                req.session.discriminator = discriminator;
+
+                return res.redirect('/dashboard');
+            }).catch((error) => {
+                console.error(' ===== GET ============================================================');
+                if (error.response) {
+                    console.error(error.response.data);
+                    console.error(error.response.status);
+                    console.error(error.response.headers);
+                    content = "Error during request";
+                } else if (error.request) {
+                    console.error(error.request);
+                    content = "No response received";
+                } else {
+                    console.error(error.message);
+                    content = "Error during request setup";
+                }
+
+                return res.status(500).render('public/error', {
+                    web_title: `HTTP 500 Internal server error | ${website.name}`,
+                    title: "HTTP 500 Internal server error",
+                    message: `There was an issue handling your request. ${content}`,
+                    error_uid: uuidv4()
+                });
+            });
+        }).catch((error) => {
+            console.error(' ===== POST ===========================================================');
+            if (error.response) {
+                console.error(error.response.data);
+                console.error(error.response.status);
+                console.error(error.response.headers);
+                content = "Error during request";
+            } else if (error.request) {
+                console.error(error.request);
+                content = "No response received";
+            } else {
+                console.error(error.message);
+                content = "Error during request setup";
+            }
+
+            return res.status(500).render('public/error', {
+                web_title: `HTTP 500 Internal server error | ${website.name}`,
+                title: "HTTP 500 Internal server error",
+                message: `There was an issue handling your request. ${content}`,
+                error_uid: uuidv4()
+            });
         });
-    });
+    } catch (error) {
+        console.error(' ===== MAIN ===========================================================');
+        if (error.response) {
+            console.error(error.response.data);
+            console.error(error.response.status);
+            console.error(error.response.headers);
+            content = "Error during request";
+        } else if (error.request) {
+            console.error(error.request);
+            content = "No response received";
+        } else {
+            console.error(error.message);
+            content = "Error during request setup";
+        }
 
-    reqToken.on('error', (error) => {
-        console.error(error);
-        res.status(500).send('Error al solicitar el token de acceso');
-    });
-
-    reqToken.write(data.toString());
-    reqToken.end();
+        return res.status(500).render('public/error', {
+            web_title: `HTTP 500 Internal server error | ${website.name}`,
+            title: "HTTP 500 Internal server error",
+            message: `There was an issue handling your request. ${content}`,
+            error_uid: uuidv4()
+        });
+    }
 });
 
 module.exports = router;

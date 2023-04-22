@@ -3,6 +3,7 @@ const express = require('express');
 const session = require('express-session');
 const mustacheExpress = require('mustache-express');
 const bodyParser = require('body-parser');
+const helmet = require('helmet');
 const cors = require('cors');
 const path = require('path');
 const glob = require('glob');
