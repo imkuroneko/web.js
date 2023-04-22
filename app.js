@@ -4,6 +4,7 @@ const session = require('express-session');
 const mustacheExpress = require('mustache-express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const glob = require('glob');
 
 /* ===== Cargar parámetros =============================================================================== */
 const config = require(path.resolve('./data/conf.json'));
@@ -32,16 +33,13 @@ app.use(session({
 
 /* ===== Cargar módulos ================================================================================== */
 try {
-    app.use(require(path.resolve('./web/public/index')));
-    app.use(require(path.resolve('./web/public/ip')));
-
-    app.use(require(path.resolve('./web/panel/login')));
-    app.use(require(path.resolve('./web/panel/logout')));
-    app.use(require(path.resolve('./web/panel/dashboard')));
-
-    app.use(require(path.resolve('./backend/login')));
-
-    app.use(require(path.resolve('./web/default')));
+    (async () => {
+        const listEndpoints = (glob.sync('./web/**/*.js')).sort();
+        listEndpoints.forEach((endpoint) => {
+            const relativePath = path.relative(__dirname, endpoint);
+            app.use(require('./' + relativePath));
+        });
+    })();
 } catch (error) {
     console.error('[load:endpoints]', error);
 }
