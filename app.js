@@ -3,6 +3,7 @@ const express = require('express');
 const session = require('express-session');
 const mustacheExpress = require('mustache-express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const path = require('path');
 const glob = require('glob');
 
@@ -23,6 +24,9 @@ app.use(express.static(__dirname + '/public'));
 /* ===== Otras configuraciones del proyecto ============================================================== */
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cors());
+app.use(helmet());
+app.disable('x-powered-by');
 
 /* ===== Configuración session =========================================================================== */
 app.use(session({
